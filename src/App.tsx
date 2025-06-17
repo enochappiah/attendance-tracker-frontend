@@ -19,6 +19,9 @@ interface Summary {
     requiredPoints: number;
 }
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
+
 function App() {
     const [users, setUsers] = useState<User[]>([]);
     const [events, setEvents] = useState<Event[]>([]);
@@ -27,14 +30,14 @@ function App() {
     const [summary, setSummary] = useState<Summary | null>(null);
 
     useEffect(() => {
-        axios.get<User[]>('/api/users').then((res) => setUsers(res.data));
-        axios.get<Event[]>('/api/events').then((res) => setEvents(res.data));
+        axios.get<User[]>(`${apiUrl}/api/users`).then((res) => setUsers(res.data));
+        axios.get<Event[]>(`${apiUrl}/api/events`).then((res) => setEvents(res.data));
     }, []);
 
     useEffect(() => {
         if (selectedUserId) {
             axios
-                .get<Summary>(`/api/summary/${selectedUserId}`)
+                .get<Summary>(`${apiUrl}/api/summary/${selectedUserId}`)
                 .then((res) => setSummary(res.data));
         }
     }, [selectedUserId]);
@@ -42,13 +45,13 @@ function App() {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        await axios.post('/api/points/attend', {
+        await axios.post(`${apiUrl}/api/points/attend`, {
             userId: parseInt(selectedUserId),
             eventId: parseInt(selectedEventId),
         });
 
         setSelectedEventId('');
-        const res = await axios.get<Summary>(`/api/points/summary/${selectedUserId}`);
+        const res = await axios.get<Summary>(`${apiUrl}/api/points/summary/${selectedUserId}`);
         setSummary(res.data);
     };
 
